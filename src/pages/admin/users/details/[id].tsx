@@ -12,7 +12,7 @@ export default function UserDetail(props : any) {
     const {status, error, data} = useQuery({
         queryKey: ['users', router.query.id ],
         queryFn: async () => {
-            return (await axiosInstance.get(`users/${router.query.id}`)).data
+            return (await axiosInstance.get(`users/${router.query.id}`)).data.data
         },
         initialData: props.user
     })
@@ -40,7 +40,7 @@ export async function getServerSideProps(context : GetServerSidePropsContext) {
     console.log(`user id ${id}`)
     await queryClient.prefetchQuery({
         queryKey : ['user', id],
-        queryFn: async () => (await axiosInstance.get(`users/${id}`)).data
+        queryFn: async () => (await axiosInstance.get(`users/${id}`)).data.data
     })
 
     return {

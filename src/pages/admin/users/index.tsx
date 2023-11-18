@@ -21,13 +21,16 @@ import {
 import SimpleTable from "@/components/admin/table";
 import Link from "next/link";
 import ConfirmationModal from "@/components/modal";
-import { useRequestForm } from "@/hooks/useRequest";
 import { UserForm } from "./create";
 import { useRouter } from "next/router";
-import useDeleteItem from "@/hooks/useDelete";
 import LoadingIndicator from "@/components/loadingIndicator/LoadingIndicator";
 import { UiState } from "@/types/ui";
+import { RestDataProvider } from "@/libs/provider/rest-data";
+import { useMutateWithUi } from "@/hooks/provider/useMutateWithUi";
 
+export const userDataProvider = new RestDataProvider<User>({
+    resource : "users"
+})
 
 interface UserColumn {
     id: string
@@ -41,20 +44,25 @@ interface UserColumn {
 
 export default function ListUsers(props: any) {
 
+    const router = useRouter();
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    const {state, onSelectItem, data, action} = useDeleteItem<User | undefined>({
-        path: "users",
-        getIdFn: (data: User | undefined) => {
-            return data?.id
+    const {state, actionWithParams, selectedItem, setSelectedItem} = useMutateWithUi<User>({
+        restDataProvider : userDataProvider,
+        onSuccess : (data : any) => {
+            router.reload()
+        },
+        onError : (error : any) => {
+            
         }
     })
 
     const { status, error, data: users } = useQuery({
         queryKey: ['users'],
         queryFn: async () => {
-            return (await axiosInstance.get("users")).data
+            const response = await userDataProvider.getPaginateList(null, null)
+            return response.data
         },
         initialData: props.users
     })
@@ -93,12 +101,12 @@ export default function ListUsers(props: any) {
                     <Link href={"users/edit/" + info.getValue<User>().id}>
                         <Button colorScheme="blue" size={"sm"} me={"3px"}> <FiEdit></FiEdit></Button>
                     </Link>
-                    <Link href={"users/details/" + info.getValue()}>
+                    <Link href={"users/details/" + info.getValue<User>().id}>
                         <Button colorScheme="green" size={"sm"} me={"3px"}><FiEye></FiEye></Button>
                     </Link>
                     <Button colorScheme="red" size={"sm"} me={"3px"} onClick={() => {
                         const user = info.getValue<User>()
-                        onSelectItem(user)
+                        setSelectedItem(user)
                         onOpen()
                     }}> <FiTrash></FiTrash></Button>
                 </>
@@ -115,7 +123,7 @@ export default function ListUsers(props: any) {
 
 
     return <>
-        <AdminBaseLayout isLoading={state === UiState.PROGRESS}>
+        <AdminBaseLayout isLoading={state.state === UiState.PROGRESS}>
             <Card>
                 <CardHeader>
                     <Heading size={"md"}>Users</Heading>
@@ -131,8 +139,12 @@ export default function ListUsers(props: any) {
         <ConfirmationModal
             onClose={onClose}
             isOpen={isOpen} title={"Confirmation"}
-            message={`Do you want to delete this user ${data?.email}?`}
-            action={() => { action() }}
+            message={`Do you want to delete this user ${selectedItem?.email}?`}
+            action={() => { actionWithParams({
+                method : "delete",
+                id : selectedItem?.id,
+                parameter : null
+            }) }}
         ></ConfirmationModal>
     </>
 }

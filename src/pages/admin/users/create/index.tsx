@@ -2,7 +2,6 @@ import AdminBaseLayout from "@/components/admin/layout/AdminBaselayout";
 import { FormComponent } from "@/components/form";
 import InputComponent from "@/components/form/input/InputComponent";
 import LoadingIndicator from "@/components/loadingIndicator/LoadingIndicator";
-import { useRequestForm } from "@/hooks/useRequest";
 import { User } from "@/types/auth/user";
 import { UiState } from "@/types/ui";
 import { Button, Card, CardBody, CardHeader, Heading, useToast } from "@chakra-ui/react";
@@ -11,6 +10,7 @@ import { useRouter } from "next/router";
 import React, { ReactNode } from "react";
 import * as Yup from "yup";
 import { ObjectShape } from "yup/lib/object";
+import { userDataProvider } from "..";
 
 export const userValidationSchema: Yup.ObjectSchema<ObjectShape> = Yup.object().shape({
     email: Yup.string().email('Invalid email'),
@@ -43,7 +43,8 @@ export default function CreateUser() {
                     }
                 }}
                     validationSchema={userValidationSchema}
-                    path="/users"
+                    dataProvider={ userDataProvider }
+                    method="post"
                     redirect="/admin/users"
                     toastTitle="Success"
                     toastDescription="Success Save User" >

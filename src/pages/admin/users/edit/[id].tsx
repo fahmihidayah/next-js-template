@@ -1,5 +1,4 @@
 import AdminBaseLayout from "@/components/admin/layout/AdminBaselayout";
-import { useRequestForm } from "@/hooks/useRequest";
 import { axiosInstance } from "@/libs/rest-data/axios";
 import { Button, Card, CardBody, CardHeader, Heading, useToast } from "@chakra-ui/react";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
@@ -14,6 +13,7 @@ import { Field, Form, FormikProps } from "formik";
 import InputComponent from "@/components/form/input/InputComponent";
 import { useEffect } from "react";
 import { FormComponent } from "@/components/form";
+import { userDataProvider } from "..";
 
 export const userValidationSchema: Yup.ObjectSchema<ObjectShape> = Yup.object().shape({
     email: Yup.string().email('Invalid email'),
@@ -26,7 +26,7 @@ export default function UserEdit(props: any) {
 
     const { status, error, data } = useQuery({
         queryKey: ['users', router.query.id],
-        queryFn: async () => (await axiosInstance.get(`users/${router.query.id}`)).data,
+        queryFn: async () => (await axiosInstance.get(`users/${router.query.id}`)).data.data,
         initialData: props.user
     })
 
@@ -46,7 +46,8 @@ export default function UserEdit(props: any) {
                 }}
                     method={"patch"}
                     validationSchema={userValidationSchema}
-                    path={`users/${router.query.id}`}
+                    dataProvider={userDataProvider}
+                    id={data.id}
                     redirect="/admin/users"
                     toastTitle="Success"
                     toastDescription="Success Update User Data" >
