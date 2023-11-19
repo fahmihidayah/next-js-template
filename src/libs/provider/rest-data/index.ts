@@ -13,24 +13,24 @@ export interface DataProviderConf {
 
 export interface IDataProvider<T> {
 
-    safeConfiguration(configuration: DataProviderConf | null): DataProviderConf
-    getMany(configuration: DataProviderConf | null, option: RequestOption | null): Promise<BaseResponse<Array<T>> | undefined>
-    getPaginateList(configuration: DataProviderConf | null, option: RequestOption | null): Promise<PaginateResponse<Array<T>>>
-    getOne(configuration: DataProviderConf | null, option: RequestOption | null): Promise<BaseResponse<T>>
-    create(configuration: DataProviderConf | null, option: RequestOption | null): Promise<BaseResponse<T>>
-    update(configuration: DataProviderConf | null, option: RequestOption | null): Promise<BaseResponse<T>>
-    delete(configuration: DataProviderConf | null, option: RequestOption | null): Promise<BaseResponse<T>>
+    safeConfiguration(configuration?: DataProviderConf): DataProviderConf
+    getMany(configuration?: DataProviderConf, option?: RequestOption): Promise<BaseResponse<Array<T>> | undefined>
+    getPaginateList(configuration?: DataProviderConf, option?: RequestOption): Promise<PaginateResponse<Array<T>>>
+    getOne(configuration?: DataProviderConf, option?: RequestOption): Promise<BaseResponse<T>>
+    create(configuration?: DataProviderConf, option?: RequestOption): Promise<BaseResponse<T>>
+    update(configuration?: DataProviderConf, option?: RequestOption): Promise<BaseResponse<T>>
+    delete(configuration?: DataProviderConf, option?: RequestOption): Promise<BaseResponse<T>>
 }
 
 export class RestDataProvider<T> implements IDataProvider<T> {
 
     constructor(
-        private configuration: DataProviderConf
+        public readonly configuration: DataProviderConf
     ) {
 
     }
 
-    safeConfiguration(configuration: DataProviderConf | null): DataProviderConf {
+    safeConfiguration(configuration?: DataProviderConf): DataProviderConf {
         if (configuration) {
             return configuration
         }
@@ -40,7 +40,7 @@ export class RestDataProvider<T> implements IDataProvider<T> {
     }
 
 
-    async getMany(configuration: DataProviderConf | null, option: RequestOption | null): Promise<BaseResponse<T[]> | undefined> {
+    async getMany(configuration?: DataProviderConf, option?: RequestOption): Promise<BaseResponse<T[]> | undefined> {
         const safeConf = this.safeConfiguration(configuration)
         const response = await axiosInstance.get(
             safeConf?.resource
@@ -54,9 +54,9 @@ export class RestDataProvider<T> implements IDataProvider<T> {
         }
     }
 
-    async getPaginateList(configuration: DataProviderConf | null, option: RequestOption | null): Promise<PaginateResponse<T[]>> {
+    async getPaginateList(configuration?: DataProviderConf, option?: RequestOption): Promise<PaginateResponse<T[]>> {
         const safeConf = this.safeConfiguration(configuration)
-        const response = await axiosInstance.get(safeConf.resource)
+        const response = await axiosInstance.get(safeConf.resource,{params :  option?.params})
         const data = response.data as PaginateResponse<T[]>
         if (data.statusCode === 200) {
             return data
@@ -66,7 +66,7 @@ export class RestDataProvider<T> implements IDataProvider<T> {
         }
     }
 
-    async getOne(configuration: DataProviderConf | null,option: RequestOption | null): Promise<BaseResponse<T>> {
+    async getOne(configuration?: DataProviderConf,option?: RequestOption): Promise<BaseResponse<T>> {
         const safeConf = this.safeConfiguration(configuration)
         const response = await axiosInstance.get(`${safeConf.resource}/${option?.id}`)
         const data = response.data as BaseResponse<T>
@@ -78,7 +78,7 @@ export class RestDataProvider<T> implements IDataProvider<T> {
         }
     }
 
-    async create(configuration: DataProviderConf | null, option: RequestOption | null): Promise<BaseResponse<T>> {
+    async create(configuration?: DataProviderConf, option?: RequestOption): Promise<BaseResponse<T>> {
         const safeConf = this.safeConfiguration(configuration)
         const response = await axiosInstance.post(`${safeConf.resource}`, option?.params)
         const data = response.data as BaseResponse<T>
@@ -90,7 +90,7 @@ export class RestDataProvider<T> implements IDataProvider<T> {
         }
     }
 
-    async update(configuration: DataProviderConf | null, option: RequestOption | null): Promise<BaseResponse<T>> {
+    async update(configuration?: DataProviderConf, option?: RequestOption): Promise<BaseResponse<T>> {
         const safeConf = this.safeConfiguration(configuration)
         const response = await axiosInstance.patch(`${safeConf.resource}/${option?.id}`, option?.params)
         const data = response.data as BaseResponse<T>
@@ -102,7 +102,7 @@ export class RestDataProvider<T> implements IDataProvider<T> {
         }
     }
 
-    async delete(configuration: DataProviderConf | null,option: RequestOption | null): Promise<BaseResponse<T>> {
+    async delete(configuration?: DataProviderConf, option?: RequestOption): Promise<BaseResponse<T>> {
         const safeConf = this.safeConfiguration(configuration)
         const response = await axiosInstance.delete(`${safeConf.resource}/${option?.id}`)
         const data = response.data as BaseResponse<T>

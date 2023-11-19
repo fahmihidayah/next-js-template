@@ -36,11 +36,13 @@ export default function UserDetail(props : any) {
 
 export async function getServerSideProps(context : GetServerSidePropsContext) {
     const queryClient = new QueryClient();
-    const {id} = context.query;
-    console.log(`user id ${id}`)
+    const query = context.query;
+    const param = context.params;
+    console.log(`fahmi log param`, param)  
+    console.log(`fahmi log query`,query)
     await queryClient.prefetchQuery({
-        queryKey : ['user', id],
-        queryFn: async () => (await axiosInstance.get(`users/${id}`)).data.data
+        queryKey : ['user', param?.id],
+        queryFn: async () => (await axiosInstance.get(`users/${query.id}`)).data.data
     })
 
     return {

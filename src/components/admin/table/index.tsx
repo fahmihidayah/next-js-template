@@ -4,10 +4,12 @@ import { Table as TanTable } from "@tanstack/react-table"
 import Pagination from "../pagination";
 
 export interface SimpleTableProps<D> {
-    table: TanTable<D>
+    table: TanTable<D>,
+    currentPage : number,
+    totalPage : number,
 }
 
-export default function SimpleTable<D>({ table }: SimpleTableProps<D>) {
+export default function SimpleTable<D>({ table, currentPage, totalPage }: SimpleTableProps<D>) {
 
     return <>
         <TableContainer borderWidth={"1px"} borderColor={"gray.100"} rounded={"md"} >
@@ -42,7 +44,7 @@ export default function SimpleTable<D>({ table }: SimpleTableProps<D>) {
             </Table>
         </TableContainer>
         <Box mt={4} >
-            <Pagination current={8} maxShow={5} total={10}></Pagination>
+            <Pagination current={currentPage} maxShow={5} total={totalPage}></Pagination>
         </Box>
     </>
 }

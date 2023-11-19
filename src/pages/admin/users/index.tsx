@@ -27,6 +27,9 @@ import LoadingIndicator from "@/components/loadingIndicator/LoadingIndicator";
 import { UiState } from "@/types/ui";
 import { RestDataProvider } from "@/libs/provider/rest-data";
 import { useMutateWithUi } from "@/hooks/provider/useMutateWithUi";
+import { createQueryClient } from "@/libs/query";
+import { useSearchParams } from "next/navigation";
+import { useTableWithUi } from "@/hooks/provider/useTableWithUi";
 
 export const userDataProvider = new RestDataProvider<User>({
     resource : "users"
@@ -48,6 +51,10 @@ export default function ListUsers(props: any) {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
+    const searchParams = useSearchParams();
+
+    const page = searchParams?.get('page') ? searchParams?.get('page') : 1
+
     const {state, actionWithParams, selectedItem, setSelectedItem} = useMutateWithUi<User>({
         restDataProvider : userDataProvider,
         onSuccess : (data : any) => {
@@ -58,16 +65,10 @@ export default function ListUsers(props: any) {
         }
     })
 
-    const { status, error, data: users } = useQuery({
-        queryKey: ['users'],
-        queryFn: async () => {
-            const response = await userDataProvider.getPaginateList(null, null)
-            return response.data
-        },
-        initialData: props.users
-    })
 
-    const columns = useMemo<ColumnDef<UserColumn>[]>(
+    
+
+    const columns : ColumnDef<UserColumn>[] = useMemo<ColumnDef<UserColumn>[]>(
         () => [
             {
                 id: "id",
@@ -113,14 +114,13 @@ export default function ListUsers(props: any) {
             }
         ], []
     )
-
-    const table = useReactTable({
-        data: users,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-        debugTable: true
+    
+    const {table, currentPage, totalPage} = useTableWithUi({
+        initalData : props.users,
+        columns : columns,
+        restDataProvider : userDataProvider
+    
     })
-
 
     return <>
         <AdminBaseLayout isLoading={state.state === UiState.PROGRESS}>
@@ -132,7 +132,7 @@ export default function ListUsers(props: any) {
                     <Link href={"users/create"}>
                         <Button mb={3} colorScheme="blue" size={"sm"}>Create</Button>
                     </Link>
-                    <SimpleTable table={table}></SimpleTable>
+                    <SimpleTable table={table} currentPage={currentPage} totalPage={totalPage}></SimpleTable>
                 </CardBody>
             </Card>
         </AdminBaseLayout>
@@ -150,13 +150,9 @@ export default function ListUsers(props: any) {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const queryClient: QueryClient = new QueryClient();
-    await queryClient.prefetchQuery({
-        queryKey: ['users'],
-        queryFn: async () => {
-            return (await axiosInstance.get("users")).data
-        }
-    })
+    const query = context.query;
+    const params = context.params;
+    const queryClient: QueryClient = await createQueryClient(userDataProvider, "getPaginateList", params, query)
     return {
         props: {
             users: dehydrate(queryClient)
