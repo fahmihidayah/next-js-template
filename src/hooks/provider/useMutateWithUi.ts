@@ -4,10 +4,11 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { ActionOption, RequestConfig, RequestFormHook } from ".";
 import { UiState } from "@/types/ui";
+import { DataProviderConf } from "@/libs/provider/rest-data";
 
 export function useMutateWithUi<D>({restDataProvider, onSuccess, onError} : RequestConfig<D>) : RequestFormHook<D> {
     const toast = useToast()
-
+    
     const [state, setState] = useState({
         state : UiState.INITIAL,
         data : null,
@@ -19,23 +20,33 @@ export function useMutateWithUi<D>({restDataProvider, onSuccess, onError} : Requ
     const mutate = useMutation({
         mutationFn : async (actionOption? : ActionOption | null) => {
             let data : any;
+            const conf = actionOption?.conf ? actionOption?.conf : restDataProvider.configuration
             if(actionOption?.method === 'post') {
-                data = await restDataProvider.create(null, {
-                    params : actionOption.parameter
+                data = await restDataProvider.create({
+                    configuration : conf,
+                    option : {
+                        params : actionOption.parameter
+                    }
                 })
             }
             else if(actionOption?.method === 'put' || actionOption?.method === 'patch') {
-                data = await restDataProvider.update(null, {
-                    params : actionOption.parameter,
-                    id : actionOption.id
+                data = await restDataProvider.update({
+                    configuration : conf,
+                    option : {
+                        params : actionOption.parameter,
+                        id : actionOption.id
+                    }
                 })
             }
             else {
-                data = await restDataProvider.delete(null, {
-                    id : actionOption?.id
+                data = await restDataProvider.delete({
+                    configuration : conf,
+                    option : {
+                        id : actionOption?.id
+                    }
                 })
             }
-           
+            
             return data.data;
         },
         onError : (error) => {

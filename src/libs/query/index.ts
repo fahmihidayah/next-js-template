@@ -18,17 +18,27 @@ export async function createQueryClient<D>(restDataProvider: RestDataProvider<D>
     query?: any,
     resource?: string,
 ) {
-    const id = params?.id
-    const queryKey = id ? [restDataProvider.configuration.resource, id] : [restDataProvider.configuration.resource]
+    const id = query?.id
+    const queryKey = [restDataProvider.configuration.resource]
+    if(id) {
+        queryKey.push(id)
+    }
     const queryClient: QueryClient = new QueryClient();
     await queryClient.prefetchQuery({
         queryKey: queryKey,
         queryFn: async () => {
-            return await restDataProvider[method](resource ? { resource } : undefined, {
-                id: id,
-                params: query
+            const response = await restDataProvider[method]({
+                configuration: resource ? {
+                    resource: resource
+                } : undefined,
+                option: {
+                    id: id,
+                    params: query
+                }
             })
+            return response;
         }
+        
     })
     return queryClient
 }

@@ -14,20 +14,24 @@ import InputComponent from "@/components/form/input/InputComponent";
 import { useEffect } from "react";
 import { FormComponent } from "@/components/form";
 import { userDataProvider } from "..";
+import { createQueryClient } from "@/libs/query";
+import { useQueryWithUi } from "@/hooks/provider/useQueryWithUi";
 
 export const userValidationSchema: Yup.ObjectSchema<ObjectShape> = Yup.object().shape({
     email: Yup.string().email('Invalid email'),
     firstName: Yup.string().min(4),
 })
 
+
+
 export default function UserEdit(props: any) {
 
-    const router = useRouter();
+    const user = props.userResponse
 
-    const { status, error, data } = useQuery({
-        queryKey: ['users', router.query.id],
-        queryFn: async () => (await axiosInstance.get(`users/${router.query.id}`)).data.data,
-        initialData: props.user
+    const {data, error, status, uiState} = useQueryWithUi<User>({
+        restDataProvider : userDataProvider, 
+        initalData : user,
+        isUseId : true
     })
 
     return <AdminBaseLayout>
@@ -47,7 +51,7 @@ export default function UserEdit(props: any) {
                     method={"patch"}
                     validationSchema={userValidationSchema}
                     dataProvider={userDataProvider}
-                    id={data.id}
+                    id={data?.id}
                     redirect="/admin/users"
                     toastTitle="Success"
                     toastDescription="Success Update User Data" >
@@ -90,18 +94,12 @@ export default function UserEdit(props: any) {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const { id } = context.query;
-
-    const queryClient = new QueryClient();
-
-    await queryClient.prefetchQuery({
-        queryKey: ['users', id],
-        queryFn: async () => (await axiosInstance.get(`users/${id}`)).data
-    })
-
+    const query = context.query;
+    const params = context.params;
+    const queryClient: QueryClient = await createQueryClient(userDataProvider, "getOne", params, query)
     return {
         props: {
-            user: dehydrate(queryClient)
+            userResponse: dehydrate(queryClient)
         }
     }
 }

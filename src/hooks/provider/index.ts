@@ -1,10 +1,11 @@
-import { RestDataProvider } from "@/libs/provider/rest-data";
+import { DataProviderConf, RestDataProvider } from "@/libs/provider/rest-data";
 import { UiStateWithData } from "@/types/ui";
 
 export interface ActionOption {
     parameter? : any | null
     id? : string | null,
-    method : 'post' | 'put' | 'patch' | 'delete'
+    method : 'post' | 'put' | 'patch' | 'delete',
+    conf? : DataProviderConf
 }
 
 export interface RequestFormHook<D> {

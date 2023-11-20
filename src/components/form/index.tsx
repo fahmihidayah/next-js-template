@@ -11,7 +11,7 @@ import { RestDataProvider } from "@/libs/provider/rest-data";
 export interface FormComponentProps<D> {
     children: any;
     method : 'post' | 'put' | 'patch' | 'delete',
-    id? : string | null;
+    id? : string;
     dataProvider : RestDataProvider<D>
     validationSchema: Yup.ObjectSchema<ObjectShape>
     redirect: string;

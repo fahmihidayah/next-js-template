@@ -3,10 +3,12 @@ import * as Yup from 'yup';
 import InputComponent from '../form/input/InputComponent';
 import { error } from 'console';
 import { Button, useToast } from '@chakra-ui/react';
-import { useRequestForm } from '@/hooks/useRequest';
 import { ForgotPasswordForm } from '@/types/auth/form';
 import { useRouter } from 'next/router';
 import { UiState } from '@/types/ui';
+import { useMutateWithUi } from '@/hooks/provider/useMutateWithUi';
+import { UserWithToken } from '@/types/auth/user';
+import { authDataProvider } from './AuthForm';
 
 const initialValue = {
     email: ''
@@ -23,23 +25,48 @@ export default function ForgotPasswordForm() {
     const router = useRouter();
     const toast = useToast();
 
-    const { state, action } = useRequestForm<any, ForgotPasswordForm>({
-        path: "auth/forgot-password",
-        onSuccess: (any) => {
-            router.push("/home")
+    const {actionWithParams, selectedItem, setSelectedItem, state} = useMutateWithUi<UserWithToken>({
+        restDataProvider : authDataProvider, 
+        onSuccess : (data : UserWithToken) => {
             toast({
-                title: "Succes",
-                description: "Reset password sent to your email!",
-                duration: 2000,
-                status: "success",
-                isClosable: false,
-                position: "top"
+                title : "Success",
+                description : "Reset password link sent to server",
+                duration : 2000,
+                status : "success",
+                isClosable : false,
+                position : "top"
             })
-        },
-        onError: (error) => {
-
+            router.push("/home")
+        }, 
+        onError : (error : any) => {
+            toast({
+                title : "Error",
+                description : error.message,
+                duration : 2000,
+                status : "error",
+                isClosable : false,
+                position : "top"
+            })
         }
     })
+
+    // const { state, action } = useRequestForm<any, ForgotPasswordForm>({
+    //     path: "auth/forgot-password",
+    //     onSuccess: (any) => {
+    //         router.push("/home")
+    //         toast({
+    //             title: "Succes",
+    //             description: "Reset password sent to your email!",
+    //             duration: 2000,
+    //             status: "success",
+    //             isClosable: false,
+    //             position: "top"
+    //         })
+    //     },
+    //     onError: (error) => {
+
+    //     }
+    // })
 
     return <>
         <Formik
@@ -48,7 +75,13 @@ export default function ForgotPasswordForm() {
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
-                action(values)
+                actionWithParams({
+                    method : "post", 
+                    conf : {
+                        resource : "auth/forgot-password"
+                    },
+                    parameter : values
+                })
             }}
         >
             {
@@ -60,7 +93,7 @@ export default function ForgotPasswordForm() {
                             id="email"
                             value={values.email}
                             onChange={handleChange}
-                            error={errors.email && touched.email ? errors.email : null}
+                            error={errors.email && touched.email ? errors.email : undefined}
                         />
                         <Button type="submit" colorScheme="blue" isLoading={isSubmitting && state.state === UiState.PROGRESS} mt={4} w={"100%"}>Submit</Button>
                     </form>

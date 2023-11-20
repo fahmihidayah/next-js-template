@@ -10,7 +10,7 @@ interface PageMeta {
     total : number;
 }
 
-export interface QueryConfig<D, C>{
+export interface TableConfig<D, C>{
     initalData : any
     columns : Array<ColumnDef<C>>
     restDataProvider : RestDataProvider<D>,
@@ -25,7 +25,7 @@ export interface TableWithUiHook<C> {
 }
 
 
-export function useTableWithUi<D,C>({initalData, columns, restDataProvider, onError, onSuccess, } : QueryConfig<D, C>) : TableWithUiHook<C> { 
+export function useTableWithUi<D,C>({initalData, columns, restDataProvider, onError, onSuccess, } : TableConfig<D, C>) : TableWithUiHook<C> { 
 
     const searchParams = useSearchParams();
 
@@ -41,9 +41,11 @@ export function useTableWithUi<D,C>({initalData, columns, restDataProvider, onEr
     const { status, error, data : listDatas } = useQuery({
         queryKey: queryKey,
         queryFn: async () => {
-            const response = await restDataProvider.getPaginateList(undefined, {
-                params : {
-                    page : page
+            const response = await restDataProvider.getPaginateList({
+                option : {
+                    params : {
+                        page : page
+                    }
                 }
             })
             setPageMeta({

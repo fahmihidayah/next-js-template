@@ -4,18 +4,24 @@ import * as Yup from 'yup';
 import { Box, Checkbox, FormControl, FormLabel, Button, Flex, Link, Card, CardBody, CardHeader, Text, Divider, Container, Input, Center, Heading, useToast } from "@chakra-ui/react";
 import InputComponent from "@/components/form/input/InputComponent";
 import { m } from "framer-motion";
-import { useRequestForm } from "@/hooks/useRequest";
 import LoadingIndicator from "@/components/loadingIndicator/LoadingIndicator";
 import { UiState, isLoading } from "@/types/ui";
 import { useEffect } from "react";
 import { AuthForm } from "@/types/auth/form";
-import { UserWithToken } from "@/types/auth/user";
+import { User, UserWithToken } from "@/types/auth/user";
 import { authProvider, setUserWithToken } from "@/libs/auth/user";
 import { useRouter } from "next/navigation";
+import { useMutateWithUi } from "@/hooks/provider/useMutateWithUi";
+import { userDataProvider } from "@/pages/admin/users";
+import { RestDataProvider } from "@/libs/provider/rest-data";
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email'),
     password: Yup.string().required('Password is required')
+})
+
+export const authDataProvider = new RestDataProvider<UserWithToken>({
+    resource : "auth"
 })
 
 export default function AuthForm() {
@@ -23,10 +29,10 @@ export default function AuthForm() {
     const router = useRouter()
     const toast = useToast()
 
-    const { state, action } = useRequestForm<AuthForm, UserWithToken>({
-        path: "auth/login",
-        onSuccess: (response: UserWithToken) => {
-            authProvider.setUser(response)
+    const {actionWithParams, selectedItem, setSelectedItem, state} = useMutateWithUi<UserWithToken>({
+        restDataProvider : authDataProvider,
+        onSuccess : (data : UserWithToken) => {
+            authProvider.setUser(data)
             toast({
                 title : "Success",
                 description : "Login success",
@@ -37,17 +43,39 @@ export default function AuthForm() {
             })
             router.push("/home")
         },
-        onError: (any) => {
+    })
 
-        },
-    });
+    // const { state, action } = useRequestForm<AuthForm, UserWithToken>({
+    //     path: "auth/login",
+    //     onSuccess: (response: UserWithToken) => {
+    //         authProvider.setUser(response)
+    //         toast({
+    //             title : "Success",
+    //             description : "Login success",
+    //             duration : 2000,
+    //             status : "success",
+    //             isClosable : false,
+    //             position : "top"
+    //         })
+    //         router.push("/home")
+    //     },
+    //     onError: (any) => {
+
+    //     },
+    // });
 
     return <>
         <Formik initialValues={{
             email: '',
             password: ''
         }} validationSchema={validationSchema} onSubmit={values => {
-            action(values)
+            actionWithParams({
+                conf : {
+                    resource : "auth/sign-in"
+                },
+                method : "post",
+                parameter : values
+            })
         }}>
             {
                 ({
