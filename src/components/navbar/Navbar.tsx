@@ -20,7 +20,7 @@ export default function Navbar() {
     const toast = useToast();
 
     return <Box bg="white" borderBottom={1} borderColor={"gray.200"} borderStyle={"solid"}>
-        <Container maxW="container.xl" pt={2} pb={2}>
+        <Container maxW="container.xl">
             <Flex justifyContent="space-between">
                 <Flex alignItems="center">
                     <Heading size="md" >Apps</Heading>

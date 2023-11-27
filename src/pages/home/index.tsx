@@ -5,7 +5,7 @@ export default function Home() {
     return <>
         <Navbar></Navbar>
         <Container >
-        <Heading size={"2xl"} mt="20" textAlign={"center"}>Welcome to real project</Heading>
+            <Heading size={"2xl"} mt="20" textAlign={"center"}>Welcome to real project</Heading>
         </Container>
     </>
 }
