@@ -66,8 +66,6 @@ export default function ListUsers(props: any) {
     })
 
 
-    
-
     const columns : ColumnDef<UserColumn>[] = useMemo<ColumnDef<UserColumn>[]>(
         () => [
             {

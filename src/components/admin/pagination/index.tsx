@@ -1,5 +1,6 @@
 import { Flex, Text } from "@chakra-ui/react";
 import BoxNumber from "./BoxNumber";
+import Link from "next/link";
 
 interface PaginationProps {
     current: number;
@@ -27,13 +28,20 @@ export default function Pagination({ current, total, maxShow }: PaginationProps)
 
     return <>
         <Flex width={"100%"} justifyContent={"end"}  >
-            <BoxNumber text="&larr;" action="" type="start" isActive={false}/>
+            <Link href={`?page=1`}>
+                <BoxNumber text="&larr;" action="" type="start" isActive={false}/>
+            </Link>
             {startIndex !== 1 && <BoxNumber text="..." action=""  type="end" isActive={false}/>}
             {numbers.map((number) => (
-                <BoxNumber text={`${number}`} action="" type="page" isActive={number === current}/>
+                <Link href={`?page=${number}`}>
+                    <BoxNumber text={`${number}`} action="" type="page" isActive={number === current}/>
+                </Link>
             ))}
              {endIndex !== total && <BoxNumber text="..." action=""  type="end" isActive={false}/>}
-             <BoxNumber text="&rarr;" action=""  type="end" isActive={false}/>
+             <Link href={`?page=${numbers.length}`}>
+                <BoxNumber text="&rarr;" action=""  type="end" isActive={false}/>
+             </Link>
+             
         </Flex>
     </>
 }

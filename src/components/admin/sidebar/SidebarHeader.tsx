@@ -1,9 +1,8 @@
 'use client'
 import { Box, Drawer, DrawerContent, useColorModeValue, useDisclosure } from "@chakra-ui/react"
-import MobileNav from "./MobileNav"
 import SidebarContent, { LinkItemProps } from "./SidebarContent"
 import { ReactNode } from "react"
-import Navbar from "@/components/navbar/Navbar"
+import AdminNavbar from "./AdminNavbar"
 
 interface SidebarWithHeaderProps {
     children : ReactNode
@@ -28,7 +27,7 @@ export default function SidebarWithHeader({linkItems, children } : SidebarWithHe
         </DrawerContent>
       </Drawer>
       {/* mobilenav */}
-      <MobileNav onOpen={onOpen} />
+      <AdminNavbar onOpen={onOpen} />
       {/* <Navbar></Navbar> */}
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}

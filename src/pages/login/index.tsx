@@ -1,3 +1,4 @@
+import AdminNavbar from "@/components/admin/sidebar/AdminNavbar";
 import AuthForm from "@/components/auth/AuthForm";
 import Navbar from "@/components/navbar/Navbar";
 import { authProvider } from "@/libs/auth/user";
@@ -8,7 +9,7 @@ import { AppProps } from "next/app";
 
 export default function LoginPage() {
     return <>
-        <Navbar></Navbar>
+        <Navbar ></Navbar>
         <Flex justify="center" m={{
             base: "10vh",
             md: "10vh",
