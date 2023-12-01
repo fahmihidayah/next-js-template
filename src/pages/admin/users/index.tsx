@@ -30,6 +30,7 @@ import { useMutateWithUi } from "@/hooks/provider/useMutateWithUi";
 import { createQueryClient } from "@/libs/query";
 import { useSearchParams } from "next/navigation";
 import { useTableWithUi } from "@/hooks/provider/useTableWithUi";
+import { useGlobalQuery } from "@/libs/store/query";
 
 export const userDataProvider = new RestDataProvider<User>({
     resource : "users"
@@ -47,13 +48,13 @@ interface UserColumn {
 
 export default function ListUsers(props: any) {
 
+    const globalQuery = useGlobalQuery((state) => state.query)
+
     const router = useRouter();
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     const searchParams = useSearchParams();
-
-    const page = searchParams?.get('page') ? searchParams?.get('page') : 1
 
     const {state, actionWithParams, selectedItem, setSelectedItem} = useMutateWithUi<User>({
         restDataProvider : userDataProvider,
@@ -64,7 +65,6 @@ export default function ListUsers(props: any) {
             
         }
     })
-
 
     const columns : ColumnDef<UserColumn>[] = useMemo<ColumnDef<UserColumn>[]>(
         () => [
@@ -77,6 +77,9 @@ export default function ListUsers(props: any) {
             {
                 id: "firstName",
                 header: "First Name",
+
+                enableColumnFilter: false,
+                enableSorting: true,
                 accessorFn: (row) => row.firstName,
                 cell: (info) => info.getValue()
             },
@@ -113,11 +116,11 @@ export default function ListUsers(props: any) {
         ], []
     )
     
-    const {table, currentPage, totalPage} = useTableWithUi({
+    const {table, pageIndex, pageSize, pageChangeAction} = useTableWithUi({
         initalData : props.users,
         columns : columns,
+        queries : props.queries,
         restDataProvider : userDataProvider
-    
     })
 
     return <>
@@ -130,7 +133,7 @@ export default function ListUsers(props: any) {
                     <Link href={"users/create"}>
                         <Button mb={3} colorScheme="blue" size={"sm"}>Create</Button>
                     </Link>
-                    <SimpleTable table={table} currentPage={currentPage} totalPage={totalPage}></SimpleTable>
+                    <SimpleTable table={table} currentPage={pageIndex} totalPage={pageSize} pageChangeAction={pageChangeAction} ></SimpleTable>
                 </CardBody>
             </Card>
         </AdminBaseLayout>
@@ -150,10 +153,12 @@ export default function ListUsers(props: any) {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const query = context.query;
     const params = context.params;
+    console.log('fahmi get server side props', query)
     const queryClient: QueryClient = await createQueryClient(userDataProvider, "getPaginateList", params, query)
     return {
         props: {
-            users: dehydrate(queryClient)
+            users: dehydrate(queryClient),
+            queries : query
         }
     }
 }

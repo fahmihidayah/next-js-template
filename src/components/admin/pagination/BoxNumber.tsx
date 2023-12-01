@@ -1,15 +1,15 @@
-import { Box, Button, Icon, Text } from "@chakra-ui/react";
+import { Box, Button, ButtonProps, FlexProps, Icon, Text } from "@chakra-ui/react";
 import {AiOutlineArrowRight, AiOutlineArrowLeft} from "react-icons/ai"
 
-interface BoxNumberProps {
+interface BoxNumberProps extends ButtonProps {
     text : string;
     action : string;
     isActive : boolean;
-    type : "page" | "start" | "end"
+    buttonType : "page" | "start" | "end"
 }
 
-export default function BoxNumber({text, type, isActive} : BoxNumberProps) {
-    return <Button variant={isActive ? "solid" :"ghost"} colorScheme={isActive? "blue" : "gray"} width={10} height={10}>
+export default function BoxNumber({text, buttonType, isActive, ... rest} : BoxNumberProps) {
+    return <Button variant={isActive ? "solid" :"ghost"} colorScheme={isActive? "blue" : "gray"} width={10} height={10} {... rest}>
         {text}
     </Button>
 

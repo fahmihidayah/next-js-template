@@ -2,14 +2,17 @@ import { Box, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui
 import { ColumnDef, ColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Table as TanTable } from "@tanstack/react-table"
 import Pagination from "../pagination";
+import { ColumnSorter } from "./ColumnSorter";
+import { PageChangeAction } from "@/hooks/provider/useTableWithUi";
 
 export interface SimpleTableProps<D> {
     table: TanTable<D>,
-    currentPage : number,
-    totalPage : number,
+    currentPage: number,
+    totalPage: number,
+    pageChangeAction : PageChangeAction
 }
 
-export default function SimpleTable<D>({ table, currentPage, totalPage }: SimpleTableProps<D>) {
+export default function SimpleTable<D>({ table, currentPage, totalPage, pageChangeAction }: SimpleTableProps<D>) {
 
     return <>
         <TableContainer borderWidth={"1px"} borderColor={"gray.100"} rounded={"md"} >
@@ -25,6 +28,8 @@ export default function SimpleTable<D>({ table, currentPage, totalPage }: Simple
                                             header.column.columnDef.header,
                                             header.getContext()
                                         )}
+
+                                    <ColumnSorter column={header.column} />
                                 </Th>
                             ))}
                         </Tr>
@@ -44,7 +49,7 @@ export default function SimpleTable<D>({ table, currentPage, totalPage }: Simple
             </Table>
         </TableContainer>
         <Box mt={4} >
-            <Pagination current={currentPage} maxShow={5} total={totalPage}></Pagination>
+            <Pagination table={table} pageIndex={currentPage} maxShow={5} pageSize={totalPage} pageChangeAction={pageChangeAction}></Pagination>
         </Box>
     </>
 }
