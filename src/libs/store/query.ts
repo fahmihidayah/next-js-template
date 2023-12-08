@@ -10,6 +10,10 @@ export function createPathFromPageAndQuery(page : number, query? : Query | null)
     return `?page=${page}&sortOrder=${query?.sort}&orderBy=${query?.orderBy}`
 }
 
+export function isPathChanged(path : string, query : Query) : boolean {
+    return path != query.path;
+}
+
 export function createPathFilter(filters : Array<Filter>) : string {
     return filters.map((filter) => `&${filter.attribute}=${filter.value}`).join("")
 }

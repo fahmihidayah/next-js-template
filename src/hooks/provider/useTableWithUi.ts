@@ -5,7 +5,7 @@ import { ColumnDef, Table, getCoreRowModel, useReactTable, SortingState, getSort
 import { useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
-import { Filter, Query, convertToQueryParameter, createPathFromQuery, useGlobalQuery } from "@/libs/store/query"
+import { Filter, Query, convertToQueryParameter, createPathFromQuery, isPathChanged, useGlobalQuery } from "@/libs/store/query"
 import { filter } from "@chakra-ui/react"
 
 export interface TableConfig<D, C> {
@@ -16,7 +16,6 @@ export interface TableConfig<D, C> {
     onSuccess?: OnSuccess<D>,
     onError?: OnError
 }
-
 
 export type PageChangeAction = (page: number) => void;
 
@@ -33,6 +32,8 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
 
     const searchParams = useSearchParams();
 
+    const router = useRouter();
+
     let queryParams: any = { pageIndex: 1 }
 
     if (searchParams) {
@@ -47,8 +48,6 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
     if (globalQuery != null) {
         queryParams.page = globalQuery.pageIndex;
     }
-
-    const router = useRouter();
 
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
         pageIndex: queryParams['page'],
@@ -96,9 +95,6 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
         manualFiltering: true,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFiltersState,
-        // onPaginationChange: (updaterOrValue) => {
-        //     console.log(table.getState().pagination, globalQuery)
-        // },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
@@ -111,42 +107,56 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
             pageIndex: page
         }
         const url = createPathFromQuery(query)
-        console.log('Pagination component - index.tsx ', query, url)
         setGlobalQuery(query)
         router.push(url)
     }
 
     useEffect(() => {
-        console.log('useTableWithUI - useEffect - sorting value ', sorting, columnFiltersState)
-        const firstSort = sorting[0];
 
-        const filters = columnFiltersState.map((e) => {
-            return {
-                attribute: e.id,
-                value: String(e.value)
-            }
-        })
-
-        if (firstSort) {
+        const relativePath = router.asPath.split("?")[0];
+        const isChanged = isPathChanged(relativePath, globalQuery);
+        console.log("isChanged", isChanged);
+        if (isChanged) {
             const query: Query = {
                 ...globalQuery,
-                sort: firstSort.desc ? "desc" : "asc",
-                filters : filters,
-                orderBy: firstSort.id
+                path: relativePath
             }
             setGlobalQuery(query)
             router.push(createPathFromQuery(query))
         }
         else {
-            const query: Query = {
-                ...globalQuery,
-                filters : filters,
-                sort: undefined,
-                orderBy: undefined
+            const firstSort = sorting[0];
+            const filters = columnFiltersState.map((e) => {
+                return {
+                    attribute: e.id,
+                    value: String(e.value)
+                }
+            })
+    
+            if (firstSort) {
+                const query: Query = {
+                    ...globalQuery,
+                    path: relativePath,
+                    sort: firstSort.desc ? "desc" : "asc",
+                    filters : filters,
+                    orderBy: firstSort.id
+                }
+                setGlobalQuery(query)
+                router.push(createPathFromQuery(query))
             }
-            setGlobalQuery(query)
-            router.push(createPathFromQuery(query))
+            else {
+                const query: Query = {
+                    ...globalQuery,
+                    path: relativePath,
+                    filters : filters,
+                    sort: undefined,
+                    orderBy: undefined
+                }
+                setGlobalQuery(query)
+                router.push(createPathFromQuery(query))
+            }
         }
+        
 
     }, [sorting, columnFiltersState])
 
