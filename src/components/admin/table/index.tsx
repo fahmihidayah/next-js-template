@@ -4,6 +4,7 @@ import { Table as TanTable } from "@tanstack/react-table"
 import Pagination from "../pagination";
 import { ColumnSorter } from "./ColumnSorter";
 import { PageChangeAction } from "@/hooks/provider/useTableWithUi";
+import { ColumnFilter } from "./ColumnFilter";
 
 export interface SimpleTableProps<D> {
     table: TanTable<D>,
@@ -30,6 +31,7 @@ export default function SimpleTable<D>({ table, currentPage, totalPage, pageChan
                                         )}
 
                                     <ColumnSorter column={header.column} />
+                                    <ColumnFilter column={header.column} />
                                 </Th>
                             ))}
                         </Tr>

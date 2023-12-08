@@ -12,9 +12,6 @@ export const ColumnSorter: React.FC<{ column: Column<any, any> }> = ({
     column,
 }) => {
 
-    const globalQuery = useGlobalQuery((state) => state.query)
-    const setGlobalQuery = useGlobalQuery((state) => state.setQuery)
-
     const route = useRouter();
 
     if (!column.getCanSort()) {

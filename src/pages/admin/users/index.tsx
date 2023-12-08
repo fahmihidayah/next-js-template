@@ -78,7 +78,7 @@ export default function ListUsers(props: any) {
                 id: "firstName",
                 header: "First Name",
 
-                enableColumnFilter: false,
+                enableColumnFilter: true,
                 enableSorting: true,
                 accessorFn: (row) => row.firstName,
                 cell: (info) => info.getValue()

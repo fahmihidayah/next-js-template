@@ -1,6 +1,7 @@
+import { filter } from "@chakra-ui/react";
 import { create } from "zustand";
 
-export interface Keyword {
+export interface Filter {
     attribute : string;
     value : string;
 }
@@ -8,14 +9,22 @@ export interface Keyword {
 export function createPathFromPageAndQuery(page : number, query? : Query | null) : string {
     return `?page=${page}&sortOrder=${query?.sort}&orderBy=${query?.orderBy}`
 }
+
+export function createPathFilter(filters : Array<Filter>) : string {
+    return filters.map((filter) => `&${filter.attribute}=${filter.value}`).join("")
+}
  
 export function createPathFromQuery(query? : Query | null) : string {
+    let path = `?page=${query?.pageIndex ?? 1}`;
     if(query?.sort) {
-        return `?page=${query?.pageIndex ?? 1}&sortOrder=${query?.sort}&orderBy=${query?.orderBy}`
+        path =  `${path}&sortOrder=${query?.sort}&orderBy=${query?.orderBy}`;
     }
-    else {
-        return `?page=${query?.pageIndex ?? 1}`
+    
+    if(query?.filters) {
+        path = `${path}${createPathFilter(query.filters)}`
     }
+
+    return path;
 }
 
 export function convertToQueryParameter(query : Query) {
@@ -29,7 +38,7 @@ export interface Query {
     pageIndex : number;
     sort? : string | false;
     orderBy? : string;
-    keywords? : Array<Keyword>;
+    filters? : Array<Filter>;
 
 }
 
