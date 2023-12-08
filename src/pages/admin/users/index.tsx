@@ -33,7 +33,7 @@ import { useTableWithUi } from "@/hooks/provider/useTableWithUi";
 import { useGlobalQuery } from "@/libs/store/query";
 
 export const userDataProvider = new RestDataProvider<User>({
-    resource : "users"
+    resource : "users",
 })
 
 interface UserColumn {
@@ -48,13 +48,9 @@ interface UserColumn {
 
 export default function ListUsers(props: any) {
 
-    const globalQuery = useGlobalQuery((state) => state.query)
-
     const router = useRouter();
 
     const { isOpen, onOpen, onClose } = useDisclosure()
-
-    const searchParams = useSearchParams();
 
     const {state, actionWithParams, selectedItem, setSelectedItem} = useMutateWithUi<User>({
         restDataProvider : userDataProvider,
@@ -153,7 +149,6 @@ export default function ListUsers(props: any) {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const query = context.query;
     const params = context.params;
-    console.log('fahmi get server side props', query)
     const queryClient: QueryClient = await createQueryClient(userDataProvider, "getPaginateList", params, query)
     return {
         props: {

@@ -10,6 +10,7 @@ import {
     FiBell,
     FiUser,
     FiChevronDown,
+    FiTag,
 } from 'react-icons/fi'
 import React from "react";
 import LoadingIndicator from "@/components/loadingIndicator/LoadingIndicator";
@@ -26,6 +27,7 @@ export default function AdminBaseLayout({ children, isLoading}: AdminBaseLayoutP
 
             { name: 'Home', icon: FiHome, link: "/admin" },
             { name: 'Users', icon: FiUser, link: "/admin/users" },
+            { name: 'Categories', icon: FiTag, link: "/admin/categories" },
             { name: 'Settings', icon: FiSettings, link: "/admin/settings" },
         ]}>
             {children}

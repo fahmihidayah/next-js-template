@@ -104,7 +104,7 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
     const pageChangeAction: PageChangeAction = (page: number) => {
         const query: Query = {
             ...globalQuery!,
-            pageIndex: page
+            pageIndex: page,
         }
         const url = createPathFromQuery(query)
         setGlobalQuery(query)
@@ -119,7 +119,11 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
         if (isChanged) {
             const query: Query = {
                 ...globalQuery,
-                path: relativePath
+                path: relativePath,
+                filters : [],
+                pageIndex: 1,
+                sort: undefined,
+                orderBy: undefined
             }
             setGlobalQuery(query)
             router.push(createPathFromQuery(query))
