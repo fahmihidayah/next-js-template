@@ -9,7 +9,7 @@ import { getuid } from "process";
 
 export interface QueryConfig<D> {
     restDataProvider : RestDataProvider<D>
-    initalData : any
+    initalData? : any
     isUseId? : boolean 
 }
 

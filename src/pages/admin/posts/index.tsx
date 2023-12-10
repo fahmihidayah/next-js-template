@@ -104,7 +104,7 @@ export default function ListPosts(props: any) {
                     <Heading size={"md"}>Posts</Heading>
                 </CardHeader>
                 <CardBody>
-                    <Link href={"blogs/create"}>
+                    <Link href={"posts/create"}>
                         <Button mb={3} colorScheme="blue" size={"sm"}>Create</Button>
                     </Link>
                     <SimpleTable table={table} currentPage={pageIndex} totalPage={pageSize} pageChangeAction={pageChangeAction} ></SimpleTable>

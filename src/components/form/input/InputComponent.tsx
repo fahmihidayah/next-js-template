@@ -1,18 +1,45 @@
-import { FormControl, FormHelperText, FormLabel, Input, ResponsiveValue } from "@chakra-ui/react";
+import { As, FormControl, FormHelperText, FormLabel, Input, InputProps, ResponsiveValue } from "@chakra-ui/react";
 import { InputHTMLAttributes } from "react";
 
-interface Props extends InputHTMLAttributes<HTMLInputElement> {
+export interface Option {
+    value : any;
+    label : string;
+}
+
+interface Props extends InputProps {
     label: string;
     error?: string;
-  }
+    as?: As;
+    options? : Option[];
+}
 
 export default function InputComponent({label,
     error,
+    options,
+    as,
     ...inputProps }: Props) {
+        let modifiedOptions : Option[] = options || []
+        if(options) {
+            modifiedOptions = [
+                {
+                    value : "",
+                    label : "Select"
+                },
+                ...options
+            ]
+        }
     return (
         <FormControl mb={5}>
             <FormLabel>{label}</FormLabel>
-            <Input {...inputProps} size={"md"}/>
+            {!!options && <Input {...inputProps} size={"md"} as="select">
+                
+                {modifiedOptions.map((option) => {
+                    return <option value={option.value}>{option.label}</option>
+                })}
+            </Input>}
+            {
+                !options && <Input {...inputProps} size={"md"} as={as}/>
+            }
             {error && <FormHelperText color="red.500">{error}</FormHelperText>}
             {/* <input type={type} className="form-control" id={id} placeholder={placeholder} value={value} onChange={onChange} /> */}
             {/* {error && <div className="text-danger">{error}</div>} */}
