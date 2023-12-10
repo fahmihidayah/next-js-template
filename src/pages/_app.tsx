@@ -9,11 +9,7 @@ import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { authProvider } from "@/libs/auth/user";
 
 
-export function getServerSideProps(context: GetServerSidePropsContext) {
-
-    console.log('Fahmi Hidayah')
-    // const user = authProvider.getIdentity(context);
-    // console.log(user)
+export function getServerSideProps(context: GetServerSidePropsContext) {    
   
     return {
       props : {}

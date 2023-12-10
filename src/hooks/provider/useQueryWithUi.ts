@@ -30,22 +30,18 @@ function getId(id? : string | string[]) : string | null {
     return null
 }
 
-
 export function useQueryWithUi<D>({restDataProvider, isUseId, initalData} : QueryConfig<D>) : QueryWithUiHook {
 
     const router = useRouter();
 
     const id = router.query.id
 
-    console.log('id user', id)
     const [uiState, setUiState] = useState<UiState>(UiState.INITIAL)
     const queryKey : Array<any> = [restDataProvider.configuration.resource]
     if(getId(id)) {
         queryKey.push(getId(id))
     }
     
-
-
     const { status, error, data } = useQuery({
         queryKey: queryKey,
         queryFn: async () => {
