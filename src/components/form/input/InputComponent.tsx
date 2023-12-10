@@ -31,7 +31,7 @@ export default function InputComponent({label,
     return (
         <FormControl mb={5}>
             <FormLabel>{label}</FormLabel>
-            {!!options && <Input {...inputProps} size={"md"} as="select">
+            {!!options && <Input {...inputProps} size={"md"} as="select" >
                 
                 {modifiedOptions.map((option) => {
                     return <option value={option.value}>{option.label}</option>

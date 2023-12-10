@@ -65,7 +65,7 @@ export default function ListPosts(props: any) {
                 header: "Content",
                 enableColumnFilter: true,
                 enableSorting: true,
-                accessorFn: (row) => row.content,
+                accessorFn: (row) => row.content.length < 50 ? row.content : row.content.substring(0, 50) + "...",
                 cell: (info) => info.getValue()
             },
             

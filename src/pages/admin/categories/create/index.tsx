@@ -13,8 +13,8 @@ import { ObjectShape } from "yup/lib/object";
 import { categoryDataProvider } from "..";
 
 export const dataValidationSchema: Yup.ObjectSchema<ObjectShape> = Yup.object().shape({
-    name: Yup.string().min(4),
-    description: Yup.string().min(4),
+    name: Yup.string().required(),
+    description: Yup.string().required(),
 })
 
 export interface CategoryForm {
@@ -59,6 +59,10 @@ export default function CreateCategory() {
                                     id="description"
                                     value={values.description}
                                     onChange={handleChange}
+                                    pt={2}
+                                    pb={2}
+                                    h={200}
+                                    as={"textarea"}
                                     error={errors.description && touched.description ? String(errors.description) : undefined} />
 
                                 <Button type="submit" colorScheme="blue" mt={4} w={"100%"}>Submit</Button>
