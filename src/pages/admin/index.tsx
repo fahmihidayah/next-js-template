@@ -1,25 +1,40 @@
 import AdminBaseLayout from "@/components/admin/layout/AdminBaselayout";
-import { Card, CardBody, CardHeader, Flex, Heading, Text } from "@chakra-ui/react";
+import { Button, Card, CardBody, CardHeader, Flex, Heading, SimpleGrid, Text } from "@chakra-ui/react";
 
 export default function AdminIndex() {
     return <AdminBaseLayout>
-        <Flex  >
-            <Card me={1}>
-                <CardHeader>
-                    <Heading size={"2xl"}>Dashboard</Heading>
-                </CardHeader>
+
+        <SimpleGrid
+            columns={{ base: 1, md: 3, lg: 3, xl: 3, "2xl": 3, sm : 1}}
+            spacing={5}
+            mt={2}
+            mb={2}
+            p={2}
+        >
+            <Card>
                 <CardBody>
-                    <Text>Content here</Text>
+                    <Heading size={"md"}>Users</Heading>
+                    <Heading>20</Heading>
+
+                    <Button colorScheme="blue" mt={5} size={"sm"}>View</Button>
                 </CardBody>
             </Card>
             <Card>
-                <CardHeader>
-                    <Heading size={"2xl"}>Dashboard</Heading>
-                </CardHeader>
                 <CardBody>
-                    <Text>Content here</Text>
+                    <Heading size={"md"}>Categories</Heading>
+                    <Heading>4</Heading>
+                    <Button colorScheme="blue" mt={5} size={"sm"}>View</Button>
                 </CardBody>
             </Card>
-        </Flex>
+            <Card>
+
+                <CardBody>
+                    <Heading size={"md"}>Posts</Heading>
+                    <Heading>12</Heading>
+                    <Button colorScheme="blue" mt={5} size={"sm"} >View</Button>
+                </CardBody>
+            </Card>
+        </SimpleGrid>
+
     </AdminBaseLayout>
 }
