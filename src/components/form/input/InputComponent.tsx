@@ -11,11 +11,13 @@ interface Props extends InputProps {
     error?: string;
     as?: As;
     options? : Option[];
+    selectedOption? : Option;
 }
 
 export default function InputComponent({label,
     error,
     options,
+    selectedOption,
     as,
     ...inputProps }: Props) {
         let modifiedOptions : Option[] = options || []
@@ -34,8 +36,8 @@ export default function InputComponent({label,
             {!!options && <Input {...inputProps} size={"md"} as="select" >
                 
                 {modifiedOptions.map((option) => {
-                    return <option value={option.value}>{option.label}</option>
-                })}
+                    return <option value={option.value} selected={option.value === selectedOption?.value } >{option.label}</option>
+                })} 
             </Input>}
             {
                 !options && <Input {...inputProps} size={"md"} as={as}/>
