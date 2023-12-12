@@ -5,7 +5,7 @@ export interface BaseResponse<T> {
 }
 
 export interface PaginateResponse<T> extends BaseResponse<T> {
-    count : number;
-    page : number;
-    totalPage : number;
+    count? : number;
+    page? : number;
+    totalPage? : number;
 }

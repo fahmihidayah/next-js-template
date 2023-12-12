@@ -2,7 +2,7 @@
 import { Box, Button, Container, Flex, Heading, useDisclosure, useToast } from "@chakra-ui/react";
 import Link from "next/link";
 import EndMenu from "./EndMenu";
-import { authProvider, getUserWithToken } from "@/libs/auth/user";
+import { authProvider, getUserWithToken } from "@/libs/provider/auth";
 import LoggedInEndMenu from "./LoggedInEndMenu";
 import { UserWithToken } from "@/types/auth/user";
 import { useEffect, useState } from "react";

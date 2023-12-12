@@ -1,13 +1,6 @@
 
 import axios from "axios";
-import { getUserWithToken } from "../auth/user";
-
-function getAuthHeader() {
-  const user = getUserWithToken();
-  if(user) {
-    return {"Authorization": `Bearer ${user.token}`}
-  }
-}
+import { authProvider, getUserWithToken } from "../provider/auth";
 
 const axiosInstance = axios.create({
   baseURL : "http://localhost:3000/api/",
@@ -15,7 +8,6 @@ const axiosInstance = axios.create({
 
   headers: {
     "Content-Type": "application/json",
-    ... getAuthHeader() 
   },
 });
 

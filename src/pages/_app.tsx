@@ -6,7 +6,7 @@ import React from "react";
 import { HydrationBoundary, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { authProvider } from "@/libs/auth/user";
+import { authProvider } from "@/libs/provider/auth";
 
 
 export function getServerSideProps(context: GetServerSidePropsContext) {    

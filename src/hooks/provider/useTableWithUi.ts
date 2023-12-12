@@ -7,28 +7,44 @@ import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
 import { Filter, Query, convertToQueryParameter, createPathFromQuery, isPathChanged, useGlobalQuery } from "@/libs/store/query"
 import { filter } from "@chakra-ui/react"
+import { UiState } from "@/types/ui"
+import { on } from "events"
+import axios, { AxiosError } from "axios"
 
 export interface TableConfig<D, C> {
     initalData: any
     columns: Array<ColumnDef<C>>
     queries?: any,
     restDataProvider: RestDataProvider<D>,
-    onSuccess?: OnSuccess<D>,
-    onError?: OnError
 }
 
 export type PageChangeAction = (page: number) => void;
 
+export function getResultTableWithUiHook(error : any) : ResultTableWithUiHook | undefined {
+    if(error) {
+        return {
+            error : error?.response?.data?.message ?? "Error unknown",
+            statusCode :error?.response?.data?.statusCode ?? 500
+        }
+    }
+}
+
+export interface ResultTableWithUiHook{
+    error? : any;
+    statusCode? : number;
+}
 
 export interface TableWithUiHook<C> {
     table: Table<C>;
     pageIndex: number;
     pageSize: number;
+    uiState : UiState;
+    result? : ResultTableWithUiHook;
     pageChangeAction: PageChangeAction;
 }
 
 
-export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, onError, onSuccess }: TableConfig<D, C>): TableWithUiHook<C> {
+export function useTableWithUi<D, C>({ initalData, columns, restDataProvider}: TableConfig<D, C>): TableWithUiHook<C> {
 
     const searchParams = useSearchParams();
 
@@ -65,7 +81,7 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
 
     const queryKey = [restDataProvider.configuration.resource, queryParams]
 
-    const { status, error, data: listDatas } = useQuery({
+    const { status, error, data: responseData, isError } = useQuery({
         queryKey: queryKey,
         queryFn: async () => {
             const response = await restDataProvider.getPaginateList({
@@ -73,17 +89,24 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
                     params: globalQuery ? convertToQueryParameter(globalQuery) : queryParams
                 }
             })
-            setPagination({
-                pageIndex: response.page,
-                pageSize: response.totalPage
-            })
-            return response.data
+
+            console.log('useTableWithUi - response', response );
+
+            if (response.statusCode >= 200 && response.statusCode < 300) {
+                setPagination({
+                    pageIndex: response.page ?? 1,
+                    pageSize: response.totalPage ?? 1,
+                })
+            }
+            return response
+           
         },
-        initialData: initalData
+        initialData: initalData,
+        
     })
 
     const table: Table<C> = useReactTable({
-        data: listDatas,
+        data: responseData.data ?? [],
         columns,
         state: {
             pagination,
@@ -115,7 +138,6 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
 
         const relativePath = router.asPath.split("?")[0];
         const isChanged = isPathChanged(relativePath, globalQuery);
-        console.log("isChanged", isChanged);
         if (isChanged) {
             const query: Query = {
                 ...globalQuery,
@@ -164,10 +186,14 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider, on
 
     }, [sorting, columnFiltersState])
 
+    console.log('useTableWithUi - status and error ', error, isError );
+
     return {
         table: table,
         pageIndex: pageIndex,
         pageSize: pageSize,
+        uiState : status === 'success' ? UiState.DONE : UiState.ERROR,
+        result : getResultTableWithUiHook(error),
         pageChangeAction: pageChangeAction
     }
 

@@ -1,7 +1,7 @@
 import AdminNavbar from "@/components/admin/sidebar/AdminNavbar";
 import AuthForm from "@/components/auth/AuthForm";
 import Navbar from "@/components/navbar/Navbar";
-import { authProvider } from "@/libs/auth/user";
+import { authProvider } from "@/libs/provider/auth";
 import { Box, Card, CardBody, Flex, Text } from "@chakra-ui/react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { AppProps } from "next/app";

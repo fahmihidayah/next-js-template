@@ -1,5 +1,6 @@
 import AdminBaseLayout from "@/components/admin/layout/AdminBaselayout"
 import SimpleTable from "@/components/admin/table"
+import ErrorContent from "@/components/error/intex"
 import ConfirmationModal from "@/components/modal"
 import { useMutateWithUi } from "@/hooks/provider/useMutateWithUi"
 import { useTableWithUi } from "@/hooks/provider/useTableWithUi"
@@ -7,7 +8,7 @@ import { RestDataProvider } from "@/libs/provider/rest-data"
 import { createQueryClient } from "@/libs/query"
 import { Category } from "@/types/category"
 import { UiState } from "@/types/ui"
-import { Button, Card, CardBody, CardHeader, Heading, useDisclosure } from "@chakra-ui/react"
+import { Button, Card, CardBody, CardHeader, Heading, Text, useDisclosure } from "@chakra-ui/react"
 import { QueryClient, dehydrate } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import { GetServerSidePropsContext } from "next"
@@ -17,7 +18,7 @@ import { useMemo } from "react"
 import { FiEdit, FiEye, FiTrash } from "react-icons/fi"
 
 export const categoryDataProvider = new RestDataProvider<Category>({
-    resource : "categories"
+    resource: "categories"
 })
 
 interface CategoryColumn {
@@ -35,17 +36,17 @@ export default function ListCategories(props: any) {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    const {state, actionWithParams, selectedItem, setSelectedItem} = useMutateWithUi<Category>({
-        restDataProvider : categoryDataProvider,
-        onSuccess : (data : any) => {
+    const { state, actionWithParams, selectedItem, setSelectedItem } = useMutateWithUi<Category>({
+        restDataProvider: categoryDataProvider,
+        onSuccess: (data: any) => {
             router.reload()
         },
-        onError : (error : any) => {
-            
+        onError: (error: any) => {
+
         }
     })
 
-    const columns : ColumnDef<CategoryColumn>[] = useMemo<ColumnDef<CategoryColumn>[]>(
+    const columns: ColumnDef<CategoryColumn>[] = useMemo<ColumnDef<CategoryColumn>[]>(
         () => [
             {
                 id: "id",
@@ -60,7 +61,7 @@ export default function ListCategories(props: any) {
                 enableSorting: true,
                 accessorFn: (row) => row.name,
                 cell: (info) => info.getValue()
-            },{
+            }, {
                 id: "description",
                 header: "Description",
                 enableColumnFilter: true,
@@ -68,7 +69,7 @@ export default function ListCategories(props: any) {
                 accessorFn: (row) => row.description,
                 cell: (info) => info.getValue()
             },
-            
+
             {
                 id: "action",
                 header: "Action",
@@ -89,37 +90,43 @@ export default function ListCategories(props: any) {
             }
         ], []
     )
-    
-    const {table, pageIndex, pageSize, pageChangeAction} = useTableWithUi({
-        initalData : props.categories,
-        columns : columns,
-        queries : props.queries,
-        restDataProvider : categoryDataProvider
+
+    const { table, pageIndex, pageSize, pageChangeAction, result, uiState } = useTableWithUi({
+        initalData: props.categories,
+        columns: columns,
+        queries: props.queries,
+        restDataProvider: categoryDataProvider
     })
 
     return <>
         <AdminBaseLayout isLoading={state.state === UiState.PROGRESS}>
             <Card>
-                <CardHeader>
-                    <Heading size={"md"}>Categories</Heading>
-                </CardHeader>
-                <CardBody>
-                    <Link href={"categories/create"}>
-                        <Button mb={3} colorScheme="blue" size={"sm"}>Create</Button>
-                    </Link>
-                    <SimpleTable table={table} currentPage={pageIndex} totalPage={pageSize} pageChangeAction={pageChangeAction} ></SimpleTable>
-                </CardBody>
+                {result?.error && <ErrorContent error={result.error} statusCode={result.statusCode}></ErrorContent> }
+                {!result?.error && <>
+                    <CardHeader>
+                        <Heading size={"md"}>Categories</Heading>
+                    </CardHeader>
+                    <CardBody>
+                        <Link href={"categories/create"}>
+                            <Button mb={3} colorScheme="blue" size={"sm"}>Create</Button>
+                        </Link>
+                        <SimpleTable table={table} currentPage={pageIndex} totalPage={pageSize} pageChangeAction={pageChangeAction} ></SimpleTable>
+                    </CardBody>
+                </>}
+
             </Card>
         </AdminBaseLayout>
         <ConfirmationModal
             onClose={onClose}
             isOpen={isOpen} title={"Confirmation"}
             message={`Do you want to delete this Category ${selectedItem?.name}?`}
-            action={() => { actionWithParams({
-                method : "delete",
-                id : String(selectedItem?.id),
-                parameter : null
-            }) }}
+            action={() => {
+                actionWithParams({
+                    method: "delete",
+                    id: String(selectedItem?.id),
+                    parameter: null
+                })
+            }}
         ></ConfirmationModal>
     </>
 }
@@ -131,7 +138,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return {
         props: {
             categories: dehydrate(queryClient),
-            queries : query
+            queries: query
         }
     }
 }

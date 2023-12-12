@@ -9,7 +9,7 @@ import { UiState, isLoading } from "@/types/ui";
 import { useEffect } from "react";
 import { AuthForm } from "@/types/auth/form";
 import { User, UserWithToken } from "@/types/auth/user";
-import { authProvider, setUserWithToken } from "@/libs/auth/user";
+import { authProvider } from "@/libs/provider/auth";
 import { useRouter } from "next/navigation";
 import { useMutateWithUi } from "@/hooks/provider/useMutateWithUi";
 import { userDataProvider } from "@/pages/admin/users";

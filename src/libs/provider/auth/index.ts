@@ -1,13 +1,14 @@
 import { AuthForm, RegisterForm } from "@/types/auth/form";
 import { User, UserWithToken } from "@/types/auth/user";
-import nookies from "nookies";
-import { axiosInstance } from "../rest-data/axios";
+import nookies, { parseCookies } from "nookies";
+import { axiosInstance } from "../../rest-data/axios";
 
 export type AuthProvider = {
     login(form: AuthForm): Promise<UserWithToken | null>
     setUser(userWithToken : UserWithToken) : Promise<void>
     // register(registerForm : RegisterForm) : Promise<Result<UserWithToken>>
     getIdentity(context: any): Promise<UserWithToken | null>
+    getToken(): string | undefined | null
 }
 
 export const authProvider: AuthProvider = {
@@ -45,23 +46,20 @@ export const authProvider: AuthProvider = {
             return parsedUser;
         }
         return null;
-    }
-}
+    },
 
-export function setUserWithToken(user: UserWithToken) {
-    localStorage.setItem("user-with-token", JSON.stringify(user))
+    getToken: () => {
+        const auth = nookies.get(null)['auth'];
+        if (auth) {
+            const parsedUser = JSON.parse(auth);
+            return parsedUser.token.accessToken;
+        }
+    }
 }
 
 export function getUserWithToken(): UserWithToken | null {
-    if (typeof window !== 'undefined') {
-        const jsonUser = localStorage.getItem("user-with-token")
-        if (jsonUser) {
-            return JSON.parse(jsonUser)
-        }
-        else {
-            return null
-        }
-    }
+    const cookies = parseCookies()
+    cookies['auth']
     return null
 
 }
