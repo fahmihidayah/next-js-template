@@ -10,10 +10,11 @@ import { useEffect } from "react";
 import { AuthForm } from "@/types/auth/form";
 import { User, UserWithToken } from "@/types/auth/user";
 import { authProvider } from "@/libs/provider/auth";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useMutateWithUi } from "@/hooks/provider/useMutateWithUi";
 import { userDataProvider } from "@/pages/admin/users";
 import { RestDataProvider } from "@/libs/provider/rest-data";
+import { useSearchParams } from "next/dist/client/components/navigation";
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email'),
@@ -25,7 +26,8 @@ export const authDataProvider = new RestDataProvider<UserWithToken>({
 })
 
 export default function AuthForm() {
-
+    const search = useSearchParams();
+    const to = search?.get("to") ?? "home";
     const router = useRouter()
     const toast = useToast()
 
@@ -41,7 +43,7 @@ export default function AuthForm() {
                 isClosable : false,
                 position : "top"
             })
-            router.push("/home")
+            router.push(to)
         },
     })
 

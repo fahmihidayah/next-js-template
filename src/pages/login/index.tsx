@@ -5,10 +5,13 @@ import { authProvider } from "@/libs/provider/auth";
 import { Box, Card, CardBody, Flex, Text } from "@chakra-ui/react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { AppProps } from "next/app";
+import { useSearchParams } from "next/navigation";
 
 
-export default function LoginPage() {
-    return <>
+export default function LoginPage(props : any) {
+    const search = useSearchParams();
+    console.log(search?.get("to"));
+        return <>
         <Navbar ></Navbar>
         <Flex justify="center" m={{
             base: "10vh",
@@ -33,3 +36,21 @@ export default function LoginPage() {
         </Flex>
     </>
 }
+
+export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
+    const auth = await authProvider.getIdentity(context);
+  
+    if (auth) {
+      return {
+        props: {},
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      };
+    }
+  
+    return {
+      props: {},
+    };
+  };

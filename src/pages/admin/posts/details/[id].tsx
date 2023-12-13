@@ -9,6 +9,7 @@ import { useQueryWithUi } from "@/hooks/provider/useQueryWithUi";
 import { User } from "@/types/auth/user";
 import { postDataProvider } from "..";
 import { Post } from "@/types/blog/post";
+import { protectUrl } from "@/libs/utilities/url";
 
 export default function PostDetail(props : any) {
 
@@ -41,6 +42,13 @@ export default function PostDetail(props : any) {
 }
 
 export async function getServerSideProps(context : GetServerSidePropsContext) {
+    const nextProps = await protectUrl({
+        context : context, 
+        nextURL : "/admin/posts"+ context.params?.id,
+    })
+    if(nextProps) {
+        return nextProps;
+    }
     const query = context.query;
     const params = context.params;
     const queryClient: QueryClient = await createQueryClient(postDataProvider, "getOne", params, query)

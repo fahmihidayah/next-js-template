@@ -182,8 +182,6 @@ export function useTableWithUi<D, C>({ initalData, columns, restDataProvider}: T
                 router.push(createPathFromQuery(query))
             }
         }
-        
-
     }, [sorting, columnFiltersState])
 
     console.log('useTableWithUi - status and error ', error, isError );

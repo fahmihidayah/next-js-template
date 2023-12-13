@@ -4,8 +4,13 @@ import ErrorContent from "@/components/error/intex"
 import ConfirmationModal from "@/components/modal"
 import { useMutateWithUi } from "@/hooks/provider/useMutateWithUi"
 import { useTableWithUi } from "@/hooks/provider/useTableWithUi"
+import { useAuth } from "@/hooks/useAuth"
+import { useCheckAuth } from "@/hooks/useCheckAuth"
+import { LOGIN_URL } from "@/libs/configuration/url"
+import { authProvider } from "@/libs/provider/auth"
 import { RestDataProvider } from "@/libs/provider/rest-data"
 import { createQueryClient } from "@/libs/query"
+import { protectUrl } from "@/libs/utilities/url"
 import { Category } from "@/types/category"
 import { UiState } from "@/types/ui"
 import { Button, Card, CardBody, CardHeader, Heading, Text, useDisclosure } from "@chakra-ui/react"
@@ -14,7 +19,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { GetServerSidePropsContext } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { FiEdit, FiEye, FiTrash } from "react-icons/fi"
 
 export const categoryDataProvider = new RestDataProvider<Category>({
@@ -98,6 +103,10 @@ export default function ListCategories(props: any) {
         restDataProvider: categoryDataProvider
     })
 
+    useCheckAuth({
+        statusCode: result?.statusCode,
+    })
+
     return <>
         <AdminBaseLayout isLoading={state.state === UiState.PROGRESS}>
             <Card>
@@ -132,6 +141,13 @@ export default function ListCategories(props: any) {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const nextProps = await protectUrl({
+        context : context, 
+        nextURL : "/admin/categories",
+    })
+    if(nextProps) {
+        return nextProps;
+    }
     const query = context.query;
     const params = context.params;
     const queryClient: QueryClient = await createQueryClient(categoryDataProvider, "getPaginateList", params, query)

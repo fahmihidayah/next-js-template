@@ -11,6 +11,8 @@ import React, { ReactNode } from "react";
 import * as Yup from "yup";
 import { ObjectShape } from "yup/lib/object";
 import { categoryDataProvider } from "..";
+import { protectUrl } from "@/libs/utilities/url";
+import { GetServerSidePropsContext } from "next";
 
 export const dataValidationSchema: Yup.ObjectSchema<ObjectShape> = Yup.object().shape({
     name: Yup.string().required(),
@@ -75,4 +77,15 @@ export default function CreateCategory() {
         </Card>
 
     </AdminBaseLayout>
+}
+
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const nextProps = await protectUrl({
+        context : context, 
+        nextURL : "/admin/categories/create",
+    })
+    if(nextProps) {
+        return nextProps;
+    }
 }

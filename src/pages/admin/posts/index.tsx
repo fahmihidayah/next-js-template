@@ -4,8 +4,10 @@ import ErrorContent from "@/components/error/intex"
 import ConfirmationModal from "@/components/modal"
 import { useMutateWithUi } from "@/hooks/provider/useMutateWithUi"
 import { useTableWithUi } from "@/hooks/provider/useTableWithUi"
+import { useCheckAuth } from "@/hooks/useCheckAuth"
 import { RestDataProvider } from "@/libs/provider/rest-data"
 import { createQueryClient } from "@/libs/query"
+import { protectUrl } from "@/libs/utilities/url"
 import { Post } from "@/types/blog/post"
 import { UiState } from "@/types/ui"
 import { Button, Card, CardBody, CardHeader, Heading, useDisclosure } from "@chakra-ui/react"
@@ -98,6 +100,10 @@ export default function ListPosts(props: any) {
         restDataProvider: postDataProvider
     })
 
+    useCheckAuth({
+        statusCode: result?.statusCode,
+    })
+    
     return <>
         <AdminBaseLayout isLoading={state.state === UiState.PROGRESS}>
             <Card>
@@ -132,7 +138,15 @@ export default function ListPosts(props: any) {
     </>
 }
 
+
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const nextProps = await protectUrl({
+        context : context, 
+        nextURL : "/admin/posts",
+    })
+    if(nextProps) {
+        return nextProps;
+    }
     const query = context.query;
     const params = context.params;
     const queryClient: QueryClient = await createQueryClient(postDataProvider, "getPaginateList", params, query)

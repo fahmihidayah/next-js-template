@@ -9,6 +9,7 @@ export type AuthProvider = {
     // register(registerForm : RegisterForm) : Promise<Result<UserWithToken>>
     getIdentity(context: any): Promise<UserWithToken | null>
     getToken(): string | undefined | null
+    refreshToken(): Promise<UserWithToken | null>
 }
 
 export const authProvider: AuthProvider = {
@@ -54,6 +55,30 @@ export const authProvider: AuthProvider = {
             const parsedUser = JSON.parse(auth);
             return parsedUser.token.accessToken;
         }
+    },
+
+    refreshToken: async (): Promise<UserWithToken | null> => {
+        const auth = nookies.get(null)['auth'];
+        if (auth) {
+            const parsedUser = JSON.parse(auth);
+            const response = await axiosInstance.post("auth/refresh-token", { refreshToken: parsedUser.token.refreshToken });
+            if (response.status !== 200) {
+                throw new Error(response.data.message)
+            }
+            const user = response.data;
+
+            if (user) {
+                nookies.set(null, "auth", JSON.stringify(user), {
+                    maxAge: 30 * 24 * 60 * 60,
+                    path: "/",
+                });
+                return user;
+            }
+            else {
+                throw new Error(response.data.message)
+            }
+        }
+        return null;
     }
 }
 

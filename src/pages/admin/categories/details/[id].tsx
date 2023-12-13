@@ -8,6 +8,7 @@ import { useQueryWithUi } from "@/hooks/provider/useQueryWithUi";
 import { User } from "@/types/auth/user";
 import { categoryDataProvider } from "..";
 import { Category } from "@/types/category";
+import { protectUrl } from "@/libs/utilities/url";
 
 export default function CategoryDetail(props : any) {
 
@@ -36,6 +37,13 @@ export default function CategoryDetail(props : any) {
 }
 
 export async function getServerSideProps(context : GetServerSidePropsContext) {
+    const nextProps = await protectUrl({
+        context : context, 
+        nextURL : "/admin/categories/details/" + context.params?.id,
+    })
+    if(nextProps) {
+        return nextProps;
+    }
     const query = context.query;
     const params = context.params;
     const queryClient: QueryClient = await createQueryClient(categoryDataProvider, "getOne", params, query)

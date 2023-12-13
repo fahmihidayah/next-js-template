@@ -14,6 +14,8 @@ import { postDataProvider } from "..";
 import { useQueryWithUi } from "@/hooks/provider/useQueryWithUi";
 import { categoryDataProvider } from "../../categories";
 import { Category } from "@/types/category";
+import { protectUrl } from "@/libs/utilities/url";
+import { GetServerSidePropsContext } from "next";
 
 export const dataValidationSchema: Yup.ObjectSchema<ObjectShape> = Yup.object().shape({
     title: Yup.string().required("Title is required"),
@@ -93,4 +95,15 @@ export default function CreatePost() {
         </Card>
 
     </AdminBaseLayout>
+}
+
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const nextProps = await protectUrl({
+        context : context, 
+        nextURL : "/admin/posts/create",
+    })
+    if(nextProps) {
+        return nextProps;
+    }
 }
