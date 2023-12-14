@@ -9,8 +9,7 @@ import { useSearchParams } from "next/navigation";
 
 
 export default function LoginPage(props : any) {
-    const search = useSearchParams();
-    console.log(search?.get("to"));
+    
         return <>
         <Navbar ></Navbar>
         <Flex justify="center" m={{
